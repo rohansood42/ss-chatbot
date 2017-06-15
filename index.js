@@ -2,35 +2,48 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
 var fbTemplate = require('fb-message-builder');
-var {
-  Wit,
-  log
-} = require('node-wit');
+var mongoose = require('mongoose');
+var Detail = require('./model');
+var fs = require('fs');
 
-var client = new Wit({
-  accessToken: '3DGBFIXDID64BGQVFZQJRVF77TMUDGB5'
-});
+mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails');
 
-client.message('i am from new delhi', {})
-  .then(function(data) {
-    //console.log('Yay, got Wit.ai response: ' + JSON.stringify(data));
-    console.log("Important fields: " + data.entities.location[0].value);
-  })
-  .catch(console.error);
+// fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\About us\\about-us.txt", function(err, data) {
+//   if (err) {
+//     return console.error(err);
+//   }
+//   //console.log("Asynchronous read: " + data.toString());
+//   var newDetail = new Detail({
+//     name: 'company_about',
+//     details: data.toString()
+//   });
+//
+//   newDetail.save(function(err) {
+//     if (!err) {
+//       console.log("Saved Detail");
+//     }
+//   });
+// });
 
-client.message('what are you called?', {})
-  .then(function(data) {
-    //console.log('Yay, got Wit.ai response: ' + JSON.stringify(data));
-    console.log("Important fields: " + data.entities.intent[0].value);
-  })
-  .catch(console.error);
+//
 
-  client.message('where do you live?', {})
-    .then(function(data) {
-      //console.log('Yay, got Wit.ai response: ' + JSON.stringify(data));
-      console.log("Important fields: " + data.entities.intent[0].value);
-    })
-    .catch(console.error);
+// var {
+//   Wit
+// } = require('node-wit');
+//
+//
+// var client = new Wit({
+//   accessToken: '3DGBFIXDID64BGQVFZQJRVF77TMUDGB5'
+// });
+//
+// client.message('what do you do?', {})
+//   .then(function(data) {
+//     console.log('Yay, got Wit.ai response: ' + JSON.stringify(data));
+//     //console.log("Important fields: " + data.entities.intent[0].value);
+//   })
+//   .catch(console.error);
+
+var lock = 0;
 
 var token = "EAAFt9hEhaegBANKr74s3MfvydguZAxsQBqB63ZCPVsXNpj3OiKprtuKFOnNQXwVZAJXaI7b1Aqdhlr54WqVP8E9ZCRCPxDDBWYGu8jmgi2DgRPK2y9eZCQvhEUTjn2AdMZAuUWtg4sQAEZBpUnb33Uz1KjqDw7jAH8zBaKBP7WXHQZDZD";
 
@@ -75,11 +88,17 @@ app.post('/webhook', function(req, res) {
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
         if (event.message && event.message.text && !event.message.is_echo) {
-          sendAction(event.sender.id, "typing_on");
-          receivedMessage(event);
+          sendAction(event.sender.id, "mark_seen");
+          setTimeout(function() {
+            sendAction(event.sender.id, "typing_on");
+            receivedMessage(event);
+          }, 2000);
         } else if (event.postback) {
-          sendAction(event.sender.id, "typing_on");
-          receivedPostback(event);
+          sendAction(event.sender.id, "mark_seen");
+          setTimeout(function() {
+            sendAction(event.sender.id, "typing_on");
+            receivedPostback(event);
+          }, 2000);
         } else if (event.delivery) {
           console.log("Message delivered!");
         } else if (event.read) {
@@ -88,9 +107,7 @@ app.post('/webhook', function(req, res) {
           sendAction(event.sender.id, "typing_on");
           receivedMessage(event);
         } else {
-          if (!event.message.is_echo) {
-            console.log("Webhook received unknown event: ", event);
-          }
+          console.log("Webhook received unknown event: ", event);
         }
       });
     });
@@ -103,6 +120,8 @@ app.post('/webhook', function(req, res) {
     res.sendStatus(200);
   }
 });
+
+// Message functions all related to sending various messages.
 
 function receivedMessage(event) {
   var senderID = event.sender.id;
@@ -119,18 +138,94 @@ function receivedMessage(event) {
   var messageAttachments = message.attachments;
 
   if (messageText) {
-
     // If we receive a text message, check to see if it matches a keyword
     // and send back the example. Otherwise, just echo the text we received.
-    switch (messageText) {
-      case 'generic':
-        sendGenericMessage(senderID);
-        break;
-      default:
-        sendTextMessage(senderID, new fbTemplate.Text('What\'s your favorite House in Game Of Thrones?').get());
-    }
+
+
+    callWitApi(messageText, function(err, data) {
+      if (err) {
+        console.error(err);
+      } else {
+        //console.log(data);
+        //console.log("Important fields: " + JSON.stringify(data));
+        var witIntent;
+        if (data.entities.intent !== undefined) {
+          witIntent = data.entities.intent[0].value;
+        }
+        //console.log(witIntent);
+        switch (witIntent) {
+          case 'greeting':
+            getUserInfo(senderID, function(err, data) {
+              text = ["Hello " + data.first_name + "!", "Howdy " + data.first_name + "!", "Yo " + data.first_name + "!"];
+              sendTextMessage(senderID, new fbTemplate.Text(text[Math.floor(Math.random() * 3) + 0]).get());
+            });
+            break;
+          case 'company_about':
+            Detail.find({
+              name: 'company_about'
+            }, function(err, detail) {
+              if (err) console.log(err);
+              // var str = detail[0].details;
+              // var results = [];
+              // var start = 0;
+              // for (var i = 640; i < str.length; i += 640) { //jump to max
+              //   while (str[i] !== "." && i) i--; //go back to .
+              //   if (start === i) throw new Error("impossible str!");
+              //   results.push(str.substr(start, i - start)); //substr to result
+              //   start = i + 1; //set next start
+              // }
+              // //add last one
+              // results.push(str.substr(start));
+              //
+              // for (var g = 0; g < results.length; g++) {
+              //   if (g === results.length-1) {
+              //     sendTextMessage(senderID, new fbTemplate.Text(results[g]).get());
+              //   } else {
+              //     sendTextMessage(senderID, new fbTemplate.Text(results[g] + ".").get());
+              //   }
+              //   setTimeout(function() {
+              //
+              //   }, 5000);
+              // }
+              //console.log(detail[0].details);
+              var str = detail[0].details;
+              var sentences = str.split(/\.\s+/);
+              var result = '';
+              sentences.forEach(function(sentence) {
+                if ((result + sentence).length <= 640) {
+                  if (result !== '') {
+                    result = result + ". " + sentence;
+                  } else {
+                    result = result + sentence;
+                  }
+                } else {
+                  //console.log(result);
+                  //console.log("end of sentence\n");
+                  result = result + ".";
+                  //console.log(result);
+                  sendTextMessage(senderID, new fbTemplate.Text(result).get());
+                  result = '';
+                }
+              });
+              setTimeout(function() {
+                sendTextMessage(senderID, new fbTemplate.Text(result).get());
+              }, 500);
+
+            });
+            break;
+          case 'get_name':
+            sendTextMessage(senderID, new fbTemplate.Text("My name is Sopra Steria Bot!").get());
+            break;
+          case 'get_job':
+            sendTextMessage(senderID, new fbTemplate.Text("I am here to help you with all the things related to Sopra Stera :D").get());
+            break;
+          default:
+            sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that!").get());
+        }
+      }
+    });
   } else if (messageAttachments) {
-    sendTextMessage(senderID, new fbTemplate.Text("Message with attachment received").get());
+    sendTextMessage(senderID, new fbTemplate.Text("I can only handle text messages currently :)").get());
   }
 }
 
@@ -208,6 +303,14 @@ function sendTextMessage(recipientId, textObject) {
  *
  */
 function callSendAPI(messageData) {
+  // while (true) {
+  //   if (lock === 0) {
+  //     break;
+  //   } else {
+  //     continue;
+  //   }
+  // }
+  // lock = 1;
   request({
     uri: 'https://graph.facebook.com/v2.6/me/messages',
     qs: {
@@ -217,6 +320,7 @@ function callSendAPI(messageData) {
     json: messageData
 
   }, function(error, response, body) {
+    lock = 0;
     if (!error && response.statusCode == 200) {
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
@@ -225,10 +329,58 @@ function callSendAPI(messageData) {
       }
     } else {
       console.error("Unable to send message.");
-      //console.error(response);
+      console.error(response);
       //console.error(error);
     }
   });
+}
+
+function callWitApi(witMessage, cb) {
+  var headers = {
+    'Authorization': 'Bearer 7NI2EMFTGD54OCQQYOVCHHYS5WXVUCBH'
+  };
+
+  var options = {
+    url: 'https://api.wit.ai/message?v=14/06/2017&q=' + encodeURIComponent(witMessage),
+    headers: headers
+  };
+
+  function callback(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var obj = JSON.parse(body);
+      cb(null, obj);
+    } else {
+      cb(error);
+      console.error("Unable to send to wit!");
+    }
+  }
+
+  request(options, callback);
+
+}
+
+function getUserInfo(user_id, cb) {
+  var headers = {
+    'Content-Type': 'application/json'
+  };
+
+  var options = {
+    url: 'https://graph.facebook.com/v2.6/' + encodeURIComponent(user_id) + '?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=' + token,
+    headers: headers
+  };
+
+  function callback(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var obj = JSON.parse(body);
+      cb(null, obj);
+    } else {
+      cb(error);
+      console.error("Unable to send to wit!");
+    }
+  }
+
+  request(options, callback);
+
 }
 
 app.listen(app.get('port'), function() {
