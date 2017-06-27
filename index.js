@@ -8,25 +8,6 @@ var fs = require('fs');
 
 mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails');
 
-// fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\About us\\corporate-responsibility.txt", function(err, data) {
-//   if (err) {
-//     return console.error(err);
-//   }
-//   //console.log("Asynchronous read: " + data.toString());
-//   var newDetail = new Detail({
-//     name: 'get_responsibility',
-//     details: data.toString()
-//   });
-//
-//   newDetail.save(function(err) {
-//     if (!err) {
-//       console.log("Saved Detail");
-//     }
-//   });
-// });
-
-//
-
 // var {
 //   Wit
 // } = require('node-wit');
@@ -168,6 +149,18 @@ function receivedMessage(event) {
             sendTextMessage(senderID, new fbTemplate.Text("I am here to help you with all the things related to Sopra Stera :D").get());
             break;
           case 'get_responsibility':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_model':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_locations':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_workexp':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_markets':
             findDetails(senderID, witIntent);
             break;
           default:
