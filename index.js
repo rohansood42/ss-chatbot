@@ -8,13 +8,13 @@ var fs = require('fs');
 
 mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails');
 
-// fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\About us\\about-us.txt", function(err, data) {
+// fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\About us\\corporate-responsibility.txt", function(err, data) {
 //   if (err) {
 //     return console.error(err);
 //   }
 //   //console.log("Asynchronous read: " + data.toString());
 //   var newDetail = new Detail({
-//     name: 'company_about',
+//     name: 'get_responsibility',
 //     details: data.toString()
 //   });
 //
@@ -42,8 +42,6 @@ mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails');
 //     //console.log("Important fields: " + data.entities.intent[0].value);
 //   })
 //   .catch(console.error);
-
-var lock = 0;
 
 var token = "EAAFt9hEhaegBANKr74s3MfvydguZAxsQBqB63ZCPVsXNpj3OiKprtuKFOnNQXwVZAJXaI7b1Aqdhlr54WqVP8E9ZCRCPxDDBWYGu8jmgi2DgRPK2y9eZCQvhEUTjn2AdMZAuUWtg4sQAEZBpUnb33Uz1KjqDw7jAH8zBaKBP7WXHQZDZD";
 
@@ -161,63 +159,16 @@ function receivedMessage(event) {
             });
             break;
           case 'company_about':
-            Detail.find({
-              name: 'company_about'
-            }, function(err, detail) {
-              if (err) console.log(err);
-              // var str = detail[0].details;
-              // var results = [];
-              // var start = 0;
-              // for (var i = 640; i < str.length; i += 640) { //jump to max
-              //   while (str[i] !== "." && i) i--; //go back to .
-              //   if (start === i) throw new Error("impossible str!");
-              //   results.push(str.substr(start, i - start)); //substr to result
-              //   start = i + 1; //set next start
-              // }
-              // //add last one
-              // results.push(str.substr(start));
-              //
-              // for (var g = 0; g < results.length; g++) {
-              //   if (g === results.length-1) {
-              //     sendTextMessage(senderID, new fbTemplate.Text(results[g]).get());
-              //   } else {
-              //     sendTextMessage(senderID, new fbTemplate.Text(results[g] + ".").get());
-              //   }
-              //   setTimeout(function() {
-              //
-              //   }, 5000);
-              // }
-              //console.log(detail[0].details);
-              var str = detail[0].details;
-              var sentences = str.split(/\.\s+/);
-              var result = '';
-              sentences.forEach(function(sentence) {
-                if ((result + sentence).length <= 640) {
-                  if (result !== '') {
-                    result = result + ". " + sentence;
-                  } else {
-                    result = result + sentence;
-                  }
-                } else {
-                  //console.log(result);
-                  //console.log("end of sentence\n");
-                  result = result + ".";
-                  //console.log(result);
-                  sendTextMessage(senderID, new fbTemplate.Text(result).get());
-                  result = '';
-                }
-              });
-              setTimeout(function() {
-                sendTextMessage(senderID, new fbTemplate.Text(result).get());
-              }, 500);
-
-            });
+            findDetails(senderID, witIntent);
             break;
           case 'get_name':
             sendTextMessage(senderID, new fbTemplate.Text("My name is Sopra Steria Bot!").get());
             break;
           case 'get_job':
             sendTextMessage(senderID, new fbTemplate.Text("I am here to help you with all the things related to Sopra Stera :D").get());
+            break;
+          case 'get_responsibility':
+            findDetails(senderID, witIntent);
             break;
           default:
             sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that!").get());
@@ -227,6 +178,61 @@ function receivedMessage(event) {
   } else if (messageAttachments) {
     sendTextMessage(senderID, new fbTemplate.Text("I can only handle text messages currently :)").get());
   }
+}
+
+function findDetails(senderid, intentWit) {
+  Detail.find({
+    name: intentWit
+  }, function(err, detail) {
+    if (err) console.log(err);
+    var str = detail[0].details;
+    var results = [];
+    var start = 0;
+    for (var i = 640; i < str.length; i += 640) { //jump to max
+      while (str[i] !== "." && i) i--; //go back to .
+      if (start === i) throw new Error("impossible str!");
+      results.push(str.substr(start, i - start)); //substr to result
+      start = i + 1; //set next start
+    }
+    //add last one
+    results.push(str.substr(start));
+
+    for (var g = 0; g < results.length; g++) {
+      if (g === results.length - 1) {
+        sendTextMessage(senderid, new fbTemplate.Text(results[g]).get());
+      } else {
+        sendTextMessage(senderid, new fbTemplate.Text(results[g] + ".").get());
+      }
+    }
+    //console.log(detail[0].details);
+    //var str = detail[0].details;
+    //console.log(str);
+    //   var sentences = str.split(/\.\s+/);
+    //   var result = '';
+    //   sentences.forEach(function(sentence) {
+    //     if ((result + sentence).length <= 640) {
+    //       if (result !== '') {
+    //         result = result + ". " + sentence;
+    //       } else {
+    //         result = result + sentence;
+    //       }
+    //     } else {
+    //       //console.log(result);
+    //       //console.log("end of sentence\n");
+    //       result = result + ".";
+    //       //console.log(result);
+    //       if (result) {
+    //         sendTextMessage(senderid, new fbTemplate.Text(result).get());
+    //       }
+    //       result = '';
+    //     }
+    //   });
+    //   setTimeout(function() {
+    //     if (result) {
+    //       sendTextMessage(senderid, new fbTemplate.Text(result).get());
+    //     }
+    //   }, 400);
+  });
 }
 
 function receivedPostback(event) {
@@ -294,7 +300,6 @@ function sendTextMessage(recipientId, textObject) {
     sendAction(recipientId, "typing_off");
     callSendAPI(messageData);
   }, 1000);
-
 }
 
 /*
@@ -303,14 +308,6 @@ function sendTextMessage(recipientId, textObject) {
  *
  */
 function callSendAPI(messageData) {
-  // while (true) {
-  //   if (lock === 0) {
-  //     break;
-  //   } else {
-  //     continue;
-  //   }
-  // }
-  // lock = 1;
   request({
     uri: 'https://graph.facebook.com/v2.6/me/messages',
     qs: {
@@ -320,7 +317,6 @@ function callSendAPI(messageData) {
     json: messageData
 
   }, function(error, response, body) {
-    lock = 0;
     if (!error && response.statusCode == 200) {
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
