@@ -163,6 +163,15 @@ function receivedMessage(event) {
           case 'company_markets':
             findDetails(senderID, witIntent);
             break;
+          case 'company_solutions':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_plm_cimpa':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_life':
+            findDetails(senderID, witIntent);
+            break;
           default:
             sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that!").get());
         }
