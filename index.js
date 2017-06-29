@@ -201,11 +201,14 @@ function findDetails(senderid, intentWit) {
 
     for (var g = 0; g < results.length; g++) {
       if (g === results.length - 1) {
-        sendTextMessage(senderid, new fbTemplate.Text(results[g]).get());
+
       } else {
-        sendTextMessage(senderid, new fbTemplate.Text(results[g] + ".").get());
+        results[g]=results[g] + ".";
       }
     }
+
+    sendMultipleTextMessages(senderid, results, 0);
+
     //console.log(detail[0].details);
     //var str = detail[0].details;
     //console.log(str);
@@ -235,6 +238,33 @@ function findDetails(senderid, intentWit) {
     //     }
     //   }, 400);
   });
+}
+
+function sendMultipleTextMessages(sender, text, i) {
+  if (i < text.length) {
+    request({
+      url: 'https://graph.facebook.com/v2.6/me/messages',
+      qs: {
+        access_token: token
+      },
+      method: 'POST',
+      json: {
+        recipient: {
+          id: sender
+        },
+        message: {
+          text: text[i]
+        },
+      }
+    }, function(error, response, body) {
+      if (error) {
+        console.log('Error sending messages: ', error);
+      } else if (response.body.error) {
+        console.log('Error: ', response.body.error);
+      }
+      sendMultipleTextMessages(sender, text, i + 1);
+    });
+  } else return;
 }
 
 function receivedPostback(event) {
