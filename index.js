@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 var Detail = require('./model');
 var fs = require('fs');
 
-mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails');
+mongoose.connect('mongodb://'+process.env.DATABASE_KEY+':'+process.env.DATABASE_PASS+'@ds129442.mlab.com:29442/ssdetails');
 
 // var {
 //   Wit
@@ -24,7 +24,7 @@ mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails');
 //   })
 //   .catch(console.error);
 
-var token = "EAAFt9hEhaegBANKr74s3MfvydguZAxsQBqB63ZCPVsXNpj3OiKprtuKFOnNQXwVZAJXaI7b1Aqdhlr54WqVP8E9ZCRCPxDDBWYGu8jmgi2DgRPK2y9eZCQvhEUTjn2AdMZAuUWtg4sQAEZBpUnb33Uz1KjqDw7jAH8zBaKBP7WXHQZDZD";
+var token = process.env.FB_TOKEN;
 
 var app = express();
 
@@ -370,11 +370,13 @@ function callSendAPI(messageData) {
 
 function callWitApi(witMessage, cb) {
   var headers = {
-    'Authorization': 'Bearer 7NI2EMFTGD54OCQQYOVCHHYS5WXVUCBH'
+    'Authorization': 'Bearer ' + process.env.WIT_TOKEN
   };
 
+  var date = "01/07/2017";
+
   var options = {
-    url: 'https://api.wit.ai/message?v=14/06/2017&q=' + encodeURIComponent(witMessage),
+    url: 'https://api.wit.ai/message?v='+date+'&q=' + encodeURIComponent(witMessage),
     headers: headers
   };
 
