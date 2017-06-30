@@ -172,8 +172,13 @@ function receivedMessage(event) {
           case 'company_life':
             findDetails(senderID, witIntent);
             break;
+          case 'thanks':
+          getUserInfo(senderID, function(err, data) {
+            sendTextMessage(senderID, new fbTemplate.Text("No need for that " + data.first_name + ". Always there to help :D").get());
+          });
+            break;
           default:
-            sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that!").get());
+            sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that! Please ask me questions related to Sopra Steria India only :)").get());
         }
       }
     });
@@ -203,7 +208,7 @@ function findDetails(senderid, intentWit) {
       if (g === results.length - 1) {
 
       } else {
-        results[g]=results[g] + ".";
+        results[g] = results[g] + ".";
       }
     }
 
