@@ -6,15 +6,14 @@ var mongoose = require('mongoose');
 var Detail = require('./model');
 var fs = require('fs');
 
-mongoose.connect('mongodb://'+process.env.DATABASE_KEY+':'+process.env.DATABASE_PASS+'@ds129442.mlab.com:29442/ssdetails');
+mongoose.connect('mongodb://' + process.env.DATABASE_KEY + ':' + process.env.DATABASE_PASS + '@ds129442.mlab.com:29442/ssdetails');
 
 // var {
 //   Wit
 // } = require('node-wit');
 //
-//
-// var client = new Wit({
-//   accessToken: '3DGBFIXDID64BGQVFZQJRVF77TMUDGB5'
+//// var client = new Wit({
+//   accessToken: ''
 // });
 //
 // client.message('what do you do?', {})
@@ -173,9 +172,9 @@ function receivedMessage(event) {
             findDetails(senderID, witIntent);
             break;
           case 'thanks':
-          getUserInfo(senderID, function(err, data) {
-            sendTextMessage(senderID, new fbTemplate.Text("No need for that " + data.first_name + ". Always there to help :D").get());
-          });
+            getUserInfo(senderID, function(err, data) {
+              sendTextMessage(senderID, new fbTemplate.Text("No need for that " + data.first_name + ". Always there to help :D").get());
+            });
             break;
           default:
             sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that! Please ask me questions related to Sopra Steria India only :)").get());
@@ -368,15 +367,25 @@ function callSendAPI(messageData) {
   });
 }
 
+function formatDate(date) {
+
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+  monthIndex++;
+
+  return day + '/' + monthIndex + '/' + year;
+}
+
 function callWitApi(witMessage, cb) {
   var headers = {
     'Authorization': 'Bearer ' + process.env.WIT_TOKEN
   };
 
-  var date = "01/07/2017";
+  var date = formatDate(new Date());
 
   var options = {
-    url: 'https://api.wit.ai/message?v='+date+'&q=' + encodeURIComponent(witMessage),
+    url: 'https://api.wit.ai/message?v=' + date + '&q=' + encodeURIComponent(witMessage),
     headers: headers
   };
 
