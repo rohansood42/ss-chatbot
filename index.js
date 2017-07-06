@@ -180,7 +180,7 @@ function receivedMessage(event) {
             break;
           case 'company_jobs':
             sendTextMessage(senderID, new fbTemplate.Text("Please tell me the skills that you have.").get());
-            //sendGenericMessage(senderID);
+            sendGenericMessage(senderID);
             break;
           default:
             sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that! Please ask me questions related to Sopra Steria India only :)").get());
