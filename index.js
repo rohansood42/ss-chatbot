@@ -6,8 +6,8 @@ var mongoose = require('mongoose');
 var Detail = require('./model');
 var fs = require('fs');
 
-mongoose.connect('mongodb://' + process.env.DATABASE_KEY + ':' + process.env.DATABASE_PASS + '@ds129442.mlab.com:29442/ssdetails',function(res,err){
-  if(err) console.error("Mongo Error");
+mongoose.connect('mongodb://' + process.env.DATABASE_KEY + ':' + process.env.DATABASE_PASS + '@ds129442.mlab.com:29442/ssdetails', function(res, err) {
+  if (err) console.error("Mongo Error");
 });
 
 // var {
@@ -306,7 +306,7 @@ function sendAction(recipientId, sender_action) {
 
 function sendGenericMessage(recipientId) {
   var generic = new fbTemplate.Generic();
-   var temp_message;
+  var temp_message;
   //  generic
   //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
   //   .addUrl('https://claudiajs.com')
@@ -323,11 +323,11 @@ function sendGenericMessage(recipientId) {
   //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
   //   .addButton('Say hello', 'HELLO')
   //   .get();
-  var data = ["Rohan","Sood","Yolo","AWESOME"];
+  var data = ["Rohan", "Sood", "Yolo", "AWESOME"];
 
-    for(var i=0;i<data.length;i++){
-      temp_message = generic.addBubble(data[i],data[i]);
-    }
+  for (var i = 0; i < data.length; i++) {
+    temp_message = generic.addBubble(data[i], data[i]).get();
+  }
 
   var messageData = {
     recipient: {
