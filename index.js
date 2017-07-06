@@ -6,7 +6,9 @@ var mongoose = require('mongoose');
 var Detail = require('./model');
 var fs = require('fs');
 
-mongoose.connect('mongodb://' + process.env.DATABASE_KEY + ':' + process.env.DATABASE_PASS + '@ds129442.mlab.com:29442/ssdetails');
+mongoose.connect('mongodb://' + process.env.DATABASE_KEY + ':' + process.env.DATABASE_PASS + '@ds129442.mlab.com:29442/ssdetails',function(res,err){
+  if(err) console.error("Mongo Error");
+});
 
 // var {
 //   Wit
@@ -176,6 +178,10 @@ function receivedMessage(event) {
               sendTextMessage(senderID, new fbTemplate.Text("No need for that " + data.first_name + ". Always there to help :D").get());
             });
             break;
+          case 'company_jobs':
+            sendTextMessage(senderID, new fbTemplate.Text("Please tell me the skills that you have.").get());
+            //sendGenericMessage(senderID);
+            break;
           default:
             sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that! Please ask me questions related to Sopra Steria India only :)").get());
         }
@@ -298,7 +304,7 @@ function sendAction(recipientId, sender_action) {
   callSendAPI(messageData);
 }
 
-function sendGenericMessage(recipientId, messageText) {
+function sendGenericMessage(recipientId) {
   var generic = new fbTemplate.Generic();
   var temp_message = generic
     .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
