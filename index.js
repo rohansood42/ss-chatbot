@@ -306,22 +306,28 @@ function sendAction(recipientId, sender_action) {
 
 function sendGenericMessage(recipientId) {
   var generic = new fbTemplate.Generic();
-  var temp_message = generic
-    .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
-    .addUrl('https://claudiajs.com')
-    .addImage('https://claudiajs.com/assets/claudiajs.png')
-    .addButton('Say hello', 'HELLO')
-    .addButton('Go to Github', 'https://github.com/claudiajs/claudia')
-    .addBubble('Claudia Bot Builder')
-    .addImage('https://claudiajs.com/assets/claudia-bot-builder-video.jpg')
-    .addButton('Go to Github', 'https://github.com/claudiajs/claudia-bot-builder')
-    .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
-    .addButton('Say hello', 'HELLO')
-    .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
-    .addButton('Say hello', 'HELLO')
-    .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
-    .addButton('Say hello', 'HELLO')
-    .get();
+   var temp_message;
+  //  generic
+  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+  //   .addUrl('https://claudiajs.com')
+  //   .addImage('https://claudiajs.com/assets/claudiajs.png')
+  //   .addButton('Say hello', 'HELLO')
+  //   .addButton('Go to Github', 'https://github.com/claudiajs/claudia')
+  //   .addBubble('Claudia Bot Builder')
+  //   .addImage('https://claudiajs.com/assets/claudia-bot-builder-video.jpg')
+  //   .addButton('Go to Github', 'https://github.com/claudiajs/claudia-bot-builder')
+  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+  //   .addButton('Say hello', 'HELLO')
+  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+  //   .addButton('Say hello', 'HELLO')
+  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+  //   .addButton('Say hello', 'HELLO')
+  //   .get();
+  var data = ["Rohan","Sood","Yolo","AWESOME"];
+
+    for(var i=0;i<data.length;i++){
+      temp_message = generic.addBubble(data[i],data[i]);
+    }
 
   var messageData = {
     recipient: {
