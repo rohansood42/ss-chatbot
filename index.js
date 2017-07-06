@@ -315,6 +315,12 @@ function sendGenericMessage(recipientId) {
     .addBubble('Claudia Bot Builder')
     .addImage('https://claudiajs.com/assets/claudia-bot-builder-video.jpg')
     .addButton('Go to Github', 'https://github.com/claudiajs/claudia-bot-builder')
+    .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+    .addButton('Say hello', 'HELLO')
+    .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+    .addButton('Say hello', 'HELLO')
+    .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+    .addButton('Say hello', 'HELLO')
     .get();
 
   var messageData = {
