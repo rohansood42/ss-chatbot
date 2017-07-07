@@ -185,6 +185,9 @@ function receivedMessage(event) {
           case 'company_jobs':
             sendTextMessage(senderID, new fbTemplate.Text("Please tell me the skills you posses and the years of experience you have!").get());
             break;
+          case 'company_all_jobs':
+            processJob(senderID, 'all');
+            break;
           default:
             sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that! Please ask me questions related to Sopra Steria India only :)").get());
         }
@@ -199,47 +202,39 @@ function processJob(senderid, entities) {
   //console.log(entities);
   var skills = [];
   var generic = new fbTemplate.Generic();
-  var message;
-  var yoe;
-  for (var i = 0; i < entities.skills.length; i++) {
-    skills.push(entities.skills[i].value);
-  }
-  yoe = entities.yoe[0].value.split(" ")[0];
+  var message,yoe,i,j;
+  if (entities !== 'all') {
+    for (i = 0; i < entities.skills.length; i++) {
+      skills.push(entities.skills[i].value);
+    }
+    yoe = entities.yoe[0].value.split(" ")[0];
 
-  //  generic
-  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
-  //   .addUrl('https://claudiajs.com')
-  //   .addImage('https://claudiajs.com/assets/claudiajs.png')
-  //   .addButton('Say hello', 'HELLO')
-  //   .addButton('Go to Github', 'https://github.com/claudiajs/claudia')
-  //   .addBubble('Claudia Bot Builder')
-  //   .addImage('https://claudiajs.com/assets/claudia-bot-builder-video.jpg')
-  //   .addButton('Go to Github', 'https://github.com/claudiajs/claudia-bot-builder')
-  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
-  //   .addButton('Say hello', 'HELLO')
-  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
-  //   .addButton('Say hello', 'HELLO')
-  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
-  //   .addButton('Say hello', 'HELLO')
-  //   .get();
-
-  for (i = 0; i < jobs.length; i++) {
-    for (var j = 0; j < skills.length; j++) {
-      if (jobs[i].skills.includes(skills[j])) {
-        if (jobs[i].exp_min <= yoe) {
-          message = generic.addBubble(jobs[i].title, "Short Description")
-            .addImage('http://www.prestationintellectuelle.com/wp-content/uploads/2015/04/logo-sopra-steria-groupe.jpg')
-            .addButton('Job Description', '' + i)
-            .addButton('Sopra Jobs Site', 'https://steria.taleo.net/careersection/in_cs_ext_fs/jobsearch.ftl')
-            .get();
+    for (i = 0; i < jobs.length; i++) {
+      for (j = 0; j < skills.length; j++) {
+        if (jobs[i].skills.includes(skills[j])) {
+          if (jobs[i].exp_min <= yoe) {
+            message = generic.addBubble(jobs[i].title, "Short Description")
+              .addImage('http://www.prestationintellectuelle.com/wp-content/uploads/2015/04/logo-sopra-steria-groupe.jpg')
+              .addButton('Job Description', '' + i)
+              .addButton('Sopra Jobs Site', 'https://steria.taleo.net/careersection/in_cs_ext_fs/jobsearch.ftl')
+              .get();
+          }
         }
       }
+    }
+  } else {
+    for (i = 0; i < jobs.length; i++) {
+        message = generic.addBubble(jobs[i].title, "Short Description")
+          .addImage('http://www.prestationintellectuelle.com/wp-content/uploads/2015/04/logo-sopra-steria-groupe.jpg')
+          .addButton('Job Description', '' + i)
+          .addButton('Sopra Jobs Site', 'https://steria.taleo.net/careersection/in_cs_ext_fs/jobsearch.ftl')
+          .get();
     }
   }
   if (message !== undefined) {
     sendGenericMessage(senderid, message);
   } else {
-    sendTextMessage(senderID, new fbTemplate.Text("Sorry no jobs currently match your search criteria :)").get());
+    sendTextMessage(senderid, new fbTemplate.Text("Sorry no jobs currently match your search criteria :)").get());
   }
   //console.log(message);
 }
@@ -342,16 +337,16 @@ function receivedPostback(event) {
       sendTextMessage(senderID, new fbTemplate.Text(jobs[0].desp).get());
       break;
     case '1':
-    sendTextMessage(senderID, new fbTemplate.Text(jobs[1].desp).get());
+      sendTextMessage(senderID, new fbTemplate.Text(jobs[1].desp).get());
       break;
     case '2':
-    sendTextMessage(senderID, new fbTemplate.Text(jobs[2].desp).get());
+      sendTextMessage(senderID, new fbTemplate.Text(jobs[2].desp).get());
       break;
     case '3':
-    sendTextMessage(senderID, new fbTemplate.Text(jobs[3].desp).get());
+      sendTextMessage(senderID, new fbTemplate.Text(jobs[3].desp).get());
       break;
     case '4':
-    sendTextMessage(senderID, new fbTemplate.Text(jobs[4].desp).get());
+      sendTextMessage(senderID, new fbTemplate.Text(jobs[4].desp).get());
       break;
   }
   console.log("Received postback for user %d and page %d with payload '%s' " +
