@@ -4,6 +4,7 @@ var request = require('request');
 var fbTemplate = require('fb-message-builder');
 var mongoose = require('mongoose');
 var Detail = require('./model');
+var jobs = require('./data');
 var fs = require('fs');
 
 mongoose.connect('mongodb://' + process.env.DATABASE_KEY + ':' + process.env.DATABASE_PASS + '@ds129442.mlab.com:29442/ssdetails', function(res, err) {
@@ -178,9 +179,11 @@ function receivedMessage(event) {
               sendTextMessage(senderID, new fbTemplate.Text("No need for that " + data.first_name + ". Always there to help :D").get());
             });
             break;
+          case 'company_jobs_skill':
+            processJob(senderID, data.entities);
+            break;
           case 'company_jobs':
-            sendTextMessage(senderID, new fbTemplate.Text("Please tell me the skills that you have.").get());
-            sendGenericMessage(senderID);
+            sendTextMessage(senderID, new fbTemplate.Text("Please tell me the skills you posses and the years of experience you have!").get());
             break;
           default:
             sendTextMessage(senderID, new fbTemplate.Text("Sorry I didn't understand that! Please ask me questions related to Sopra Steria India only :)").get());
@@ -190,6 +193,55 @@ function receivedMessage(event) {
   } else if (messageAttachments) {
     sendTextMessage(senderID, new fbTemplate.Text("I can only handle text messages currently :)").get());
   }
+}
+
+function processJob(senderid, entities) {
+  //console.log(entities);
+  var skills = [];
+  var generic = new fbTemplate.Generic();
+  var message;
+  var yoe;
+  for (var i = 0; i < entities.skills.length; i++) {
+    skills.push(entities.skills[i].value);
+  }
+  yoe = entities.yoe[0].value.split(" ")[0];
+
+  //  generic
+  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+  //   .addUrl('https://claudiajs.com')
+  //   .addImage('https://claudiajs.com/assets/claudiajs.png')
+  //   .addButton('Say hello', 'HELLO')
+  //   .addButton('Go to Github', 'https://github.com/claudiajs/claudia')
+  //   .addBubble('Claudia Bot Builder')
+  //   .addImage('https://claudiajs.com/assets/claudia-bot-builder-video.jpg')
+  //   .addButton('Go to Github', 'https://github.com/claudiajs/claudia-bot-builder')
+  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+  //   .addButton('Say hello', 'HELLO')
+  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+  //   .addButton('Say hello', 'HELLO')
+  //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
+  //   .addButton('Say hello', 'HELLO')
+  //   .get();
+
+  for (i = 0; i < jobs.length; i++) {
+    for (var j = 0; j < skills.length; j++) {
+      if (jobs[i].skills.includes(skills[j])) {
+        if (jobs[i].exp_min <= yoe) {
+          message = generic.addBubble(jobs[i].title, "Short Description")
+            .addImage('http://www.prestationintellectuelle.com/wp-content/uploads/2015/04/logo-sopra-steria-groupe.jpg')
+            .addButton('Job Description', '' + i)
+            .addButton('Sopra Jobs Site', 'https://steria.taleo.net/careersection/in_cs_ext_fs/jobsearch.ftl')
+            .get();
+        }
+      }
+    }
+  }
+  if (message !== undefined) {
+    sendGenericMessage(senderid, message);
+  } else {
+    sendTextMessage(senderID, new fbTemplate.Text("Sorry no jobs currently match your search criteria :)").get());
+  }
+  //console.log(message);
 }
 
 function findDetails(senderid, intentWit) {
@@ -285,12 +337,29 @@ function receivedPostback(event) {
   // The 'payload' param is a developer-defined field which is set in a postback
   // button for Structured Messages.
   var payload = event.postback.payload;
+  switch (payload) {
+    case '0':
+      sendTextMessage(senderID, new fbTemplate.Text(jobs[0].desp).get());
+      break;
+    case '1':
+    sendTextMessage(senderID, new fbTemplate.Text(jobs[1].desp).get());
+      break;
+    case '2':
+    sendTextMessage(senderID, new fbTemplate.Text(jobs[2].desp).get());
+      break;
+    case '3':
+    sendTextMessage(senderID, new fbTemplate.Text(jobs[3].desp).get());
+      break;
+    case '4':
+    sendTextMessage(senderID, new fbTemplate.Text(jobs[4].desp).get());
+      break;
+  }
   console.log("Received postback for user %d and page %d with payload '%s' " +
     "at %d", senderID, recipientID, payload, timeOfPostback);
 
   // When a postback is called, we'll send a message back to the sender to
   // let them know it was successful
-  sendTextMessage(senderID, new fbTemplate.Text("Postback called").get());
+  //sendTextMessage(senderID, new fbTemplate.Text("Postback called").get());
 }
 
 function sendAction(recipientId, sender_action) {
@@ -304,9 +373,9 @@ function sendAction(recipientId, sender_action) {
   callSendAPI(messageData);
 }
 
-function sendGenericMessage(recipientId) {
+function sendGenericMessage(recipientId, message) {
   var generic = new fbTemplate.Generic();
-  var temp_message;
+  var temp_message = message;
   //  generic
   //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
   //   .addUrl('https://claudiajs.com')
@@ -323,11 +392,13 @@ function sendGenericMessage(recipientId) {
   //   .addBubble('Claudia.js', 'Deploy Node.js microservices to AWS easily')
   //   .addButton('Say hello', 'HELLO')
   //   .get();
-  var data = ["Rohan", "Sood", "Yolo", "AWESOME"];
-
-  for (var i = 0; i < data.length; i++) {
-    temp_message = generic.addBubble(data[i], data[i]).get();
-  }
+  // var data = ["Rohan", "Sood", "Yolo", "AWESOME"];
+  //
+  // for (var i = 0; i < data.length; i++) {
+  //   temp_message = generic.addBubble(data[i], data[i])
+  //     .addButton('Say hello', 'HELLO')
+  //     .get();
+  // }
 
   var messageData = {
     recipient: {
@@ -403,7 +474,7 @@ function callWitApi(witMessage, cb) {
   var date = formatDate(new Date());
 
   var options = {
-    url: 'https://api.wit.ai/message?v=' + date + '&q=' + encodeURIComponent(witMessage),
+    url: 'https://api.wit.ai/message?v=' + encodeURIComponent(date) + '&q=' + encodeURIComponent(witMessage),
     headers: headers
   };
 
