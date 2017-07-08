@@ -2,15 +2,17 @@ var mongoose = require('mongoose');
 var Detail = require('./model');
 var fs = require('fs');
 
-mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails');
+mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails',function(err,res){
+  if(err) throw err;
+});
 
-fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\life-in-sopra-steria.txt", function(err, data) {
+fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\Offerings\\Propert-Managemen-Solutions.txt", function(err, data) {
   if (err) {
     return console.error(err);
   }
   //console.log("Asynchronous read: " + data.toString());
   var newDetail = new Detail({
-    name: 'company_life',
+    name: 'company_offerings_pms',
     details: data.toString()
   });
 

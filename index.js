@@ -174,6 +174,75 @@ function receivedMessage(event) {
           case 'company_life':
             findDetails(senderID, witIntent);
             break;
+          case 'company_market_aerospace':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_banking':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_defence':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_energy':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_insurance':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_homeland':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_retail':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_public_sector':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_tele':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_market_transport':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_banking':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_bigdata':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_cloud':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_cim':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_cybersecurity':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_enterprisearch':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_erp':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_hrs':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_itassets':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_mobility':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_pms':
+            findDetails(senderID, witIntent);
+            break;
+          case 'full_form_sopra':
+            sendTextMessage(senderID, new fbTemplate.Text("It stands for Society Of Programmers Researchers and Analysts. Bet you didn't know that :p").get());
+            break;
           case 'thanks':
             getUserInfo(senderID, function(err, data) {
               sendTextMessage(senderID, new fbTemplate.Text("No need for that " + data.first_name + ". Always there to help :D").get());
@@ -183,7 +252,7 @@ function receivedMessage(event) {
             processJob(senderID, data.entities);
             break;
           case 'company_jobs':
-            sendTextMessage(senderID, new fbTemplate.Text("Please tell me the skills you posses and the years of experience you have!").get());
+            sendTextMessage(senderID, new fbTemplate.Text("Please tell me the skills you posses and the years of experience you have! Or you can view all the jobs without me sorting them for you :)").get());
             break;
           case 'company_all_jobs':
             processJob(senderID, 'all');
@@ -209,12 +278,20 @@ function processJob(senderid, entities) {
     }
     yoe = entities.yoe[0].value.split(" ")[0];
 
+    if (yoe === undefined) {
+      sendTextMessage(senderid, new fbTemplate.Text("You forgot to tell me the amount of experience you have :)").get());
+      return;
+    } else if (skills.length === 0) {
+      sendTextMessage(senderid, new fbTemplate.Text("Please tell me the skills you have :)").get());
+      return;
+    }
+
     for (i = 0; i < jobs.length; i++) {
       for (j = 0; j < skills.length; j++) {
         if (jobs[i].skills.includes(skills[j])) {
           if (jobs[i].exp_min <= yoe) {
             shortDesp = "Skills -";
-            for (var k = 0;k < jobs[i].skills.length; k++) {
+            for (var k = 0; k < jobs[i].skills.length; k++) {
               shortDesp = shortDesp + " " + jobs[i].skills[k];
             }
             shortDesp = shortDesp + "\n" + "Experience - " + jobs[i].exp_min + "-" + jobs[i].exp_max + " years";
