@@ -199,10 +199,9 @@ function receivedMessage(event) {
 }
 
 function processJob(senderid, entities) {
-  //console.log(entities);
   var skills = [];
   var generic = new fbTemplate.Generic();
-  var message,yoe,i,j;
+  var message, yoe, i, j;
   if (entities !== 'all') {
     for (i = 0; i < entities.skills.length; i++) {
       skills.push(entities.skills[i].value);
@@ -224,11 +223,16 @@ function processJob(senderid, entities) {
     }
   } else {
     for (i = 0; i < jobs.length; i++) {
-        message = generic.addBubble(jobs[i].title, "Short Description")
-          .addImage('http://www.prestationintellectuelle.com/wp-content/uploads/2015/04/logo-sopra-steria-groupe.jpg')
-          .addButton('Job Description', '' + i)
-          .addButton('Sopra Jobs Site', 'https://steria.taleo.net/careersection/in_cs_ext_fs/jobsearch.ftl')
-          .get();
+      var shortDesp = "Skills -";
+      for (j = 0; j < jobs[i].skills.length; j++) {
+        shortDesp = shortDesp + " " + jobs[i].skills[j];
+      }
+      shortDesp = shortDesp + "\n" + "Experience - " + jobs[i].exp_min + "-" + jobs[i].exp_max + " years";
+      message = generic.addBubble(jobs[i].title, shortDesp)
+        .addImage('http://www.prestationintellectuelle.com/wp-content/uploads/2015/04/logo-sopra-steria-groupe.jpg')
+        .addButton('Job Description', '' + i)
+        .addButton('Sopra Jobs Site', 'https://steria.taleo.net/careersection/in_cs_ext_fs/jobsearch.ftl')
+        .get();
     }
   }
   if (message !== undefined) {
