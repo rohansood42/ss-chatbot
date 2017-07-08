@@ -201,6 +201,7 @@ function receivedMessage(event) {
 function processJob(senderid, entities) {
   var skills = [];
   var generic = new fbTemplate.Generic();
+  var shortDesp;
   var message, yoe, i, j;
   if (entities !== 'all') {
     for (i = 0; i < entities.skills.length; i++) {
@@ -212,7 +213,12 @@ function processJob(senderid, entities) {
       for (j = 0; j < skills.length; j++) {
         if (jobs[i].skills.includes(skills[j])) {
           if (jobs[i].exp_min <= yoe) {
-            message = generic.addBubble(jobs[i].title, "Short Description")
+            shortDesp = "Skills -";
+            for (var k = 0;k < jobs[i].skills.length; k++) {
+              shortDesp = shortDesp + " " + jobs[i].skills[k];
+            }
+            shortDesp = shortDesp + "\n" + "Experience - " + jobs[i].exp_min + "-" + jobs[i].exp_max + " years";
+            message = generic.addBubble(jobs[i].title, shortDesp)
               .addImage('http://www.prestationintellectuelle.com/wp-content/uploads/2015/04/logo-sopra-steria-groupe.jpg')
               .addButton('Job Description', '' + i)
               .addButton('Sopra Jobs Site', 'https://steria.taleo.net/careersection/in_cs_ext_fs/jobsearch.ftl')
@@ -223,7 +229,7 @@ function processJob(senderid, entities) {
     }
   } else {
     for (i = 0; i < jobs.length; i++) {
-      var shortDesp = "Skills -";
+      shortDesp = "Skills -";
       for (j = 0; j < jobs[i].skills.length; j++) {
         shortDesp = shortDesp + " " + jobs[i].skills[j];
       }
