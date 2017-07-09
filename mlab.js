@@ -6,13 +6,13 @@ mongoose.connect('mongodb://test:test@ds129442.mlab.com:29442/ssdetails',functio
   if(err) throw err;
 });
 
-fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\Offerings\\Propert-Managemen-Solutions.txt", function(err, data) {
+fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\Solutions\\testing.txt", function(err, data) {
   if (err) {
     return console.error(err);
   }
   //console.log("Asynchronous read: " + data.toString());
   var newDetail = new Detail({
-    name: 'company_offerings_pms',
+    name: 'company_solutions_testing',
     details: data.toString()
   });
 
@@ -25,5 +25,3 @@ fs.readFile("C:\\Users\\Rohan Sood\\Documents\\Scraped Content\\Offerings\\Prope
     }
   });
 });
-
-//SOCIETY OF RESEARCH ANALYST

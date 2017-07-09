@@ -240,6 +240,36 @@ function receivedMessage(event) {
           case 'company_offerings_pms':
             findDetails(senderID, witIntent);
             break;
+          case 'company_offerings_smartcities':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_offerings_socialmedia':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_solutions_am':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_solutions_bps':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_solutions_consulting':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_solutions_im':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_solutions_sti':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_solutions_software':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_solutions_systemsint':
+            findDetails(senderID, witIntent);
+            break;
+          case 'company_solutions_testing':
+            findDetails(senderID, witIntent);
+            break;
           case 'full_form_sopra':
             sendTextMessage(senderID, new fbTemplate.Text("It stands for Society Of Programmers Researchers and Analysts. Bet you didn't know that :p").get());
             break;
